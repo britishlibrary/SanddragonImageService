@@ -105,13 +105,13 @@ namespace SanddragonImageService
             {
                 ProcessStartInfo start = new ProcessStartInfo();
 
-                start.FileName = ConfigurationManager.AppSettings["KakaduInstall"] + "kdu_expand.exe";
+                start.FileName = ConfigurationManager.AppSettings["ExpanderPath"];
                 start.UseShellExecute = false;
                 start.RedirectStandardOutput = false;
                 start.RedirectStandardError = false;
                 start.CreateNoWindow = true;
 
-                start.Arguments = "-i \"" + p_filename + "\" -record " + p_filename + ".log";
+                start.Arguments = "-i \"" + ConfigurationManager.AppSettings["JP2CachePath"] + Path.GetFileName(p_filename) + "\" -record \"" + p_filename + ".log\"";
 
                 Process proc = Process.Start(start);
                 proc.WaitForExit();
@@ -189,17 +189,13 @@ namespace SanddragonImageService
                 {
                     if (!regions[0].StartsWith("%"))
                     {
-                        starty = int.Parse(regions[0]);
-                        startx = int.Parse(regions[1]);
-                        tileheight = int.Parse(regions[2]);
-                        tilewidth = int.Parse(regions[3]);
+                        tilewidth = int.Parse(regions[2]);
+                        tileheight = int.Parse(regions[3]);
                     }
                     else
                     {
-                        starty = float.Parse(regions[0].Substring(1)) * imageSize.Height;
-                        startx = float.Parse(regions[1]) * imageSize.Width;
-                        tileheight = double.Parse(regions[2]) * imageSize.Height;
-                        tilewidth = double.Parse(regions[3]) * imageSize.Width;
+                        tilewidth = double.Parse(regions[2]) * imageSize.Width;
+                        tileheight = double.Parse(regions[3]) * imageSize.Height;
                     }
                 }
                 // assume all region returned 
@@ -387,7 +383,7 @@ namespace SanddragonImageService
                 string outputFile = ConfigurationManager.AppSettings["JP2CachePath"] + p_state.Target.Replace(".jpg", ".bmp");
 
                 ProcessStartInfo start = new ProcessStartInfo();
-                start.FileName = ConfigurationManager.AppSettings["KakaduInstall"] + "kdu_expand.exe";
+                start.FileName = ConfigurationManager.AppSettings["ExpanderPath"];
                 start.UseShellExecute = false;
                 start.RedirectStandardOutput = false;
                 start.RedirectStandardError = true;
