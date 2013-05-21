@@ -497,10 +497,10 @@ namespace SanddragonImageService
                             int sizeHeight = Convert.ToInt32(state.height);
                             double regionWidth = img.Width;
                             if (!string.IsNullOrEmpty(state.regionWidth))
-                                regionWidth = Convert.ToInt32(state.regionWidth);
+                                regionWidth = Convert.ToDouble(state.regionWidth);
                             double regionHeight = img.Height;
                             if (!string.IsNullOrEmpty(state.regionHeight))
-                                regionHeight = Convert.ToInt32(state.regionHeight);
+                                regionHeight = Convert.ToDouble(state.regionHeight);
 
                             double scalex = sizeWidth / regionWidth;
                             double scaley = sizeHeight / regionHeight;
