@@ -37,7 +37,7 @@ namespace SanddragonImageService
             {
                 context.Response.Clear();
                 context.Response.ClearHeaders();
-                
+
 
                 string result = "";
 
@@ -48,26 +48,29 @@ namespace SanddragonImageService
                     err.parameter = "unknown";
                     err.text = "Request > 1024 characters, too long";
                 }
-                else 
+                else
                     result = GetWidthAndHeight(context.Request["identifier"], context.Request["return"]);
 
                 if (err != null)
                 {
-                    context.Response.ContentType = "text/xml";
+                    context.Response.TrySkipIisCustomErrors = true;
+                    context.Response.ContentType = "application/xml";
+                    context.Response.AddHeader("content-disposition", "inline;");
                     context.Response.StatusCode = (int)err.statusCode;
+                    context.Response.Charset = "";
                 }
                 else if (context.Request["return"].Equals("json"))
                 {
                     context.Response.ContentType = "application/json";
-                    context.Response.AddHeader("content-disposition", "attachment; filename=export.json");
+                    context.Response.AddHeader("content-disposition", "inline; filename=export.json");
                 }
                 else
                 {
                     context.Response.ContentType = "application/xml";
-                    context.Response.AddHeader("content-disposition", "attachment; filename=export.xml");
+                    context.Response.AddHeader("content-disposition", "inline; filename=export.xml");
                 }
 
-                context.Response.AddHeader("Link", "<http://library.stanford.edu/iiif/image-api/compliance.html#level2>;rel=\"compliesTo\"");                
+                context.Response.AddHeader("Link", "<http://library.stanford.edu/iiif/image-api/compliance.html#level2>;rel=\"profile\"");
                 context.Response.AddHeader("content-length", (result.Length).ToString());
 
                 context.Response.Flush();
@@ -78,6 +81,10 @@ namespace SanddragonImageService
             catch (Exception e)
             {
                 context.Response.Write(e.Message);
+            }
+            finally
+            {
+                context.Response.End();
             }
         }
 
@@ -93,6 +100,7 @@ namespace SanddragonImageService
                 doc.LoadXml(xmlMetadata);
 
                 Metadata data = new Metadata();
+                data.profile = "http://library.stanford.edu/iiif/image-api/compliance.html#level2";
                 data.identifier = p_identifier;
                 data.width = int.Parse(doc.GetElementsByTagName("Width")[0].InnerText);
                 data.height = int.Parse(doc.GetElementsByTagName("Height")[0].InnerText);
@@ -165,13 +173,14 @@ namespace SanddragonImageService
             {
                 XmlWriterSettings settings = new XmlWriterSettings()
                 {
-                    Encoding = Encoding.ASCII
+                    Encoding = new UTF8Encoding(false)
+//                    Encoding = Encoding.ASCII
                 };
                 using (XmlWriter writer = XmlWriter.Create(memoryStream, settings))
                 {
                     xs.Serialize(writer, obj, ns);
                 }
-                return Encoding.ASCII.GetString(memoryStream.ToArray());
+                return Encoding.UTF8.GetString(memoryStream.ToArray());
             }
         }
 

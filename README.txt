@@ -40,10 +40,33 @@ This project was developed using the Kakadu Software kdu_expand.exe component an
 //
 
 For image metadata information - 
-http://[ServerName]/[SanddragonImageService site]/Metadata/[jp2 filename]/info.xml
+http://[ServerName]/[SanddragonImageService site]/[jp2 filename]/info.xml
 
 To get a full colour image at 10% of size -
-http://[ServerName]/[SanddragonImageService site]/image/[jp2 filename]/full/pct:10/0/color
+http://[ServerName]/[SanddragonImageService site]/[jp2 filename]/full/pct:10/0/color.jpg
+
+For a RESTful IIIF Service the following rules should be added to web.config at the server root level - 
+
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+				<rule name="Sanddragon XML Metadata rewrite root" enabled="true">
+				  <match url="^(.*)SanddragonImageService/(.+)/info.xml" />
+				  <action type="Rewrite" url="{R:1}SanddragonImageService/ImageMetadataHandler.ashx?identifier={R:2}&amp;return=xml" />
+				</rule>				
+				<rule name="Sanddragon JSON Metadata rewrite root" enabled="true">
+				  <match url="^(.*)SanddragonImageService/(.+)/info.json" />
+				  <action type="Rewrite" url="{R:1}SanddragonImageService/ImageMetadataHandler.ashx?identifier={R:2}&amp;return=json" />
+				</rule>
+				<rule name="Sanddragon Image rewrite root" enabled="true">
+				  <match url="^(.*)SanddragonImageService/(.+)/(.+)/(.+)/(.+)/(.+)" />
+				  <action type="Rewrite" url="{R:1}SanddragonImageService/ImageHandler.ashx?identifier={R:2}&amp;region={R:3}&amp;size={R:4}&amp;rotation={R:5}&amp;quality_format={R:6}" />
+				</rule>
+            </rules>
+        </rewrite>
+    </system.webServer>
+</configuration>
 
 Further usage examples can be found at the IIIF link - http://library.stanford.edu/iiif/image-api/
 
